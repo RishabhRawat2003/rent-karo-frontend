@@ -14,6 +14,7 @@ interface Organization {
     description: string;
     images: string[];
     user: string;
+    is_verified: boolean;
     createdAt: string;
     updatedAt: string;
 }
@@ -243,8 +244,12 @@ export default function CreateOrganizationPage() {
                                     </p>
                                 </div>
                             </div>
-                            <span className="bg-green-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
-                                Already Registered
+                            <span className={`${organization.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'} text-sm font-medium px-3 py-1 rounded-full`}>
+                                {
+                                    organization.is_verified
+                                    ? 'Already Registered'
+                                    : 'Pending Verification'
+                                }
                             </span>
                         </div>
 

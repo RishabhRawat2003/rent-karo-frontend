@@ -1,7 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { PlusCircle, Image as ImageIcon } from 'lucide-react';
-import CreateProductForm from '@/components/Product/CreateProductForm';
+import Link from 'next/link';
 
 interface Product {
     _id: string;
@@ -114,13 +114,13 @@ export default function ProductsPage() {
         <div className="container min-h-screen pt-20 mx-auto p-4">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
                 <h1 className="text-2xl font-bold text-gray-900">Product List</h1>
-                <button
-                    onClick={() => setShowCreateForm(true)}
+                <Link
+                href={'/pages/account/my-listing/create-product'}
                     className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
                 >
                     <PlusCircle className="w-5 h-5" />
                     Create Product
-                </button>
+                </Link>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -227,13 +227,6 @@ export default function ProductsPage() {
                     </div>
                 ))}
             </div>
-
-            {showCreateForm && (
-                <CreateProductForm
-                    onClose={() => setShowCreateForm(false)}
-                    onProductCreated={(newProduct) => setProducts([...products, newProduct])}
-                />
-            )}
         </div>
     );
 }
