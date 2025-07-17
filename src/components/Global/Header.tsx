@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { ShoppingCart, User, Menu, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { usePathname } from "next/navigation";
-import { jwtDecode } from 'jwt-decode';
 import { TOKEN } from '@/utils/enum';
+import { decodeToken } from '@/utils/decodeToken';
 
 const Header = () => {
     const pathname = usePathname();
@@ -25,7 +25,7 @@ const Header = () => {
 
     useEffect(() => {
         if (storedToken) {
-            const decodedToken = jwtDecode(storedToken);
+            const decodedToken = decodeToken(storedToken);
             if (decodedToken?.email) {
                 setIsLoggedIn(true);
             }

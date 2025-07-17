@@ -1,5 +1,6 @@
 "use client";
 import { ArrowRight, Camera, Laptop, Car, Sofa, Wrench, Shirt, Star, Verified } from 'lucide-react';
+import Image from 'next/image';
 
 export const ProductShowcase = () => {
     const rentals = [
@@ -71,7 +72,9 @@ export const ProductShowcase = () => {
                             <div className="border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl transition-all bg-white">
                                 {/* Image Container */}
                                 <div className="relative overflow-hidden">
-                                    <img
+                                    <Image
+                                        width={100}
+                                        height={100}
                                         src={`https://source.unsplash.com/random/800x800/?${item.category.toLowerCase()},${item.id}`}
                                         alt={item.title}
                                         className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-110"

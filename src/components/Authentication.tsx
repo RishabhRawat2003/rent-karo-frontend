@@ -17,11 +17,12 @@ interface AuthenticationProps {
 export const GoogleSignUp: React.FC<AuthenticationProps> = ({ role }) => {
     const router = useRouter();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleLoginSuccess = async (response: any) => {
         const idToken = response.credential;
         try {
             const res = await axios.post(`${backend}/user/google-auth`, { idToken, role });
-            if(res.status === 200) {
+            if (res.status === 200) {
                 localStorage.setItem(TOKEN, JSON.stringify(res.data.token));
                 router.push("/");
                 toast.success("User Created Successfully");
@@ -52,18 +53,18 @@ export const GoogleSignUp: React.FC<AuthenticationProps> = ({ role }) => {
 export const GoogleSignIn: React.FC = () => {
     const router = useRouter();
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleLoginSuccess = async (response: any) => {
         const idToken = response.credential;
         try {
             const res = await axios.post(`${backend}/user/google-auth-sigin`, { idToken });
-            if(res.status === 200) {
+            if (res.status === 200) {
                 localStorage.setItem(TOKEN, JSON.stringify(res.data.token));
                 router.push("/");
                 toast.success("User Logged in Successfully");
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error("Error sending ID token to backend:", error);
-            toast.error(error.response.data.message);
             router.push("/pages/signup");
         }
     };

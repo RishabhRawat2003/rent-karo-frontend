@@ -12,6 +12,7 @@ import {
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
 import { createKyc, getKycByUser } from "@/store/kycSlice";
+import Image from 'next/image';
 
 export default function KYCVerification() {
   const [kycInfo, setKycInfo] = useState<{
@@ -25,11 +26,13 @@ export default function KYCVerification() {
     panNumber: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { loading } = useSelector((state: any) => state.kyc)
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch()
 
   const fetchKYCStatus = async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response = await dispatch(getKycByUser() as any)
     if (response?.error) {
       toast.info(response.error.message)
@@ -67,7 +70,7 @@ export default function KYCVerification() {
       formData.append('panImage', panImage);
     }
 
-
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const response = await dispatch(createKyc(formData as any) as any)
     if (response?.error) {
       toast.error(response.error.message)
@@ -204,7 +207,9 @@ export default function KYCVerification() {
                         </div>
                       </label>
                       {aadhaarImage && (
-                        <img
+                        <Image
+                          width={100}
+                          height={100}
                           src={URL.createObjectURL(aadhaarImage)}
                           alt="Aadhaar preview"
                           className="w-32 h-32 object-contain border rounded-lg"
@@ -263,7 +268,9 @@ export default function KYCVerification() {
                         </div>
                       </label>
                       {panImage && (
-                        <img
+                        <Image
+                          width={100}
+                          height={100}
                           src={URL.createObjectURL(panImage)}
                           alt="PAN preview"
                           className="w-32 h-32 object-contain border rounded-lg"

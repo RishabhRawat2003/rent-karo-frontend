@@ -23,6 +23,7 @@ export default function Page() {
     const [showPassword, setShowPassword] = useState(false);
     const disptach = useDispatch()
     const router = useRouter()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { loading } = useSelector((state: any) => state.user)
 
     const validateForm = (data: SigninFormData): string | null => {
@@ -54,6 +55,7 @@ export default function Page() {
             toast.error(errorMessage);
             return;
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const response = await disptach(login(formData as any) as any)
         if (response?.error) {
             toast.error(response.error.message)
@@ -146,7 +148,7 @@ export default function Page() {
                 </form>
 
                 <div className="mt-8 text-center text-sm text-gray-500">
-                    Don't have an account?{' '}
+                    Don&apos;t have an account?{' '}
                     <Link href="/pages/signup" className="font-semibold text-blue-600 hover:text-blue-700">
                         Sign up here
                     </Link>

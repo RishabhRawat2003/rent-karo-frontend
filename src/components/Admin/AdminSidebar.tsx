@@ -13,6 +13,7 @@ import { jwtDecode } from 'jwt-decode';
 import { ADMINTOKEN } from '@/utils/enum';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { MyTokenPayload } from '@/utils/decodeToken';
 
 interface AdminSidebarProps {
     isCollapsed: boolean;
@@ -34,7 +35,10 @@ const AdminSidebar = ({ isCollapsed, setIsCollapsed }: AdminSidebarProps) => {
     useEffect(() => {
         const token = JSON.parse(localStorage.getItem(ADMINTOKEN) || '{}');
         if (token) {
-            const decodedToken: any = jwtDecode(token);
+            const decodedToken: MyTokenPayload = jwtDecode(token);
+            if (decodedToken.role !== 'admin') {
+                router.push('/');
+            }
         }
         else {
             router.push('/');

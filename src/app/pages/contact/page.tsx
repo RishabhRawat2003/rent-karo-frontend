@@ -11,7 +11,7 @@ const ContactPage = () => {
                         Get in <span className="bg-gradient-to-r from-blue-600 to-green-500 bg-clip-text text-transparent">Touch</span>
                     </h1>
                     <p className="text-xl text-gray-600 mb-8">
-                        We're here to help you with all your rental needs
+                        We&apos;re here to help you with all your rental needs
                     </p>
                 </div>
             </section>

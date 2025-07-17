@@ -1,5 +1,6 @@
 "use client";
-import { Ban, Box, Calendar, DollarSign, Filter, Info, Layers, Loader, Search, ShieldAlert, ShoppingCart, Sliders, Tag, X } from 'lucide-react';
+import { Ban, Box, Calendar, DollarSign, Info, Layers, Loader, Search, ShieldAlert, ShoppingCart, Sliders, X } from 'lucide-react';
+import Image from 'next/image';
 import { useState, useEffect } from 'react';
 
 interface Product {
@@ -179,7 +180,9 @@ const ProductCard = ({ product, onSelect, onToggleBlock }: {
       }`}
   >
     <div className="relative">
-      <img
+      <Image
+        width={100}
+        height={100}
         src={product.images[0]}
         alt={product.title}
         className="w-full h-48 object-cover rounded-t-xl cursor-pointer"
@@ -263,13 +266,17 @@ const ProductModal = ({ product, onClose, onToggleBlock }: {
           {/* Image Gallery */}
           <div>
             <div className="grid grid-cols-2 gap-3">
-              <img
+              <Image
+                width={100}
+                height={100}
                 src={product.images[0]}
                 alt="Main"
                 className="col-span-2 h-64 w-full object-cover rounded-lg"
               />
               {product.images.slice(1, 5).map((img, i) => (
-                <img
+                <Image
+                  width={100}
+                  height={100}
                   key={i}
                   src={img}
                   alt={`Preview ${i + 1}`}

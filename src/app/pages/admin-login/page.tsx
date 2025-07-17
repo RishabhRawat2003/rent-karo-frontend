@@ -22,6 +22,7 @@ export default function AdminLoginPage() {
     const [showPassword, setShowPassword] = useState(false);
     const dispatch = useDispatch();
     const router = useRouter();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { loading } = useSelector((state: any) => state.admin);
 
     const validateForm = (data: AdminLoginFormData): string | null => {
@@ -53,6 +54,7 @@ export default function AdminLoginPage() {
             toast.error(errorMessage);
             return;
         }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const response = await dispatch(login(formData as any) as any);
         if (response?.error) {
             toast.error(response.error.message);

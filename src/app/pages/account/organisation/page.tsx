@@ -4,9 +4,10 @@ import { PlusCircle, Building2, Trash2, ArrowLeft, Info, ArrowUpRight } from 'lu
 import { useDispatch, useSelector } from 'react-redux';
 import { createOrganisation, getSingleOrganisation } from '@/store/organisationSlice';
 import { toast } from 'react-toastify';
-import { createKyc, createKycBusiness, getKycById, getKycByUser } from '@/store/kycSlice';
+import { createKycBusiness, getKycById } from '@/store/kycSlice';
 import { BUSINESS } from '@/utils/enum';
 import { LoadingSpinnerWithOverlay } from '@/components/Loading';
+import Image from 'next/image';
 
 interface Organization {
     _id: string;
@@ -69,7 +70,7 @@ export default function CreateOrganizationPage() {
         description: '',
         gstNumber: '',
     });
-
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { loading } = useSelector((state: any) => state.organisation);
     const dispatch = useDispatch()
 
@@ -82,6 +83,7 @@ export default function CreateOrganizationPage() {
                 formData2.append('image', images[i]);
             }
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const response = await dispatch(createOrganisation(formData2 as any) as any)
         if (response?.error) {
             toast.error(response.error.message)
@@ -93,6 +95,7 @@ export default function CreateOrganizationPage() {
     }
 
     async function checkOrganisation() {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const response = await dispatch(getSingleOrganisation() as any)
         if (response?.error) {
             return
@@ -103,7 +106,8 @@ export default function CreateOrganizationPage() {
         }
     }
 
-    async function checkKyc(id: any) {
+    async function checkKyc(id: string) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const response = await dispatch(getKycById(id as any) as any)
         if (response?.error) {
             toast.error(response.error.message)
@@ -180,7 +184,7 @@ export default function CreateOrganizationPage() {
             newFormData.append('companyPANCard', kycDocuments.companyPANCard)
             newFormData.append('authorizedSignatoryIDProof', kycDocuments.authorizedSignatoryIDProof)
 
-
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const response = await dispatch(createKycBusiness(newFormData as any) as any)
             if (response?.error) {
                 toast.error(response.error.message)
@@ -247,8 +251,8 @@ export default function CreateOrganizationPage() {
                             <span className={`${organization.is_verified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'} text-sm font-medium px-3 py-1 rounded-full`}>
                                 {
                                     organization.is_verified
-                                    ? 'Already Registered'
-                                    : 'Pending Verification'
+                                        ? 'Already Registered'
+                                        : 'Pending Verification'
                                 }
                             </span>
                         </div>
@@ -331,7 +335,7 @@ export default function CreateOrganizationPage() {
                                     <div>
                                         <p className="text-sm text-blue-800">
                                             Your KYC verification is in progress. This usually takes 2-3 business days.
-                                            You'll receive an email notification once your verification is complete.
+                                            You&apos;ll receive an email notification once your verification is complete.
                                         </p>
                                         <p className="text-sm text-blue-800 mt-2">
                                             Last updated: {new Date(kyc?.updatedAt).toLocaleDateString()}
@@ -441,7 +445,9 @@ export default function CreateOrganizationPage() {
                                     </div>
                                     {kycPreviews[field as keyof typeof kycPreviews] && (
                                         <div className="relative group aspect-video mt-2">
-                                            <img
+                                            <Image
+                                                width={100}
+                                                height={100}
                                                 src={kycPreviews[field as keyof typeof kycPreviews]!}
                                                 alt={`${field} preview`}
                                                 className="w-full h-full object-cover rounded-lg"
@@ -548,7 +554,9 @@ export default function CreateOrganizationPage() {
                                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                                     {previews.map((preview, index) => (
                                         <div key={index} className="relative group aspect-square">
-                                            <img
+                                            <Image
+                                                width={100}
+                                                height={100}
                                                 src={preview}
                                                 alt={`Preview ${index + 1}`}
                                                 className="w-full h-full object-cover rounded-lg"
@@ -628,7 +636,9 @@ export default function CreateOrganizationPage() {
                                     </div>
                                     {kycPreviews[field as keyof typeof kycPreviews] && (
                                         <div className="relative group aspect-video mt-2">
-                                            <img
+                                            <Image
+                                                width={100}
+                                                height={100}
                                                 src={kycPreviews[field as keyof typeof kycPreviews]!}
                                                 alt={`${field} preview`}
                                                 className="w-full h-full object-cover rounded-lg"

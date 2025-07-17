@@ -1,6 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { ArrowRight, ShieldCheck, Tag, Handshake } from 'lucide-react';
+import Image from 'next/image';
 
 const HeroSection = () => {
     return (
@@ -16,7 +17,7 @@ const HeroSection = () => {
                         </h1>
 
                         <p className="text-lg text-gray-600 md:pr-12">
-                            Your trusted marketplace for quality rentals and purchases. Find what you need or earn from items you're not using.
+                            Your trusted marketplace for quality rentals and purchases. Find what you need or earn from items you&apos;re not using.
                         </p>
 
                         <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
@@ -62,7 +63,9 @@ const HeroSection = () => {
 
                     <div className="md:w-1/2">
                         <div className="relative w-full h-96 bg-gray-100 rounded-2xl overflow-hidden hover:shadow-xl transition-shadow">
-                            <img
+                            <Image
+                                width={1000}
+                                height={1000}
                                 src="https://images.unsplash.com/photo-1556740714-a8395b3bf30f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80"
                                 alt="RentKaro marketplace"
                                 className="w-full h-full object-cover object-center"

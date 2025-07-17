@@ -1,5 +1,5 @@
 "use client";
-import { Home, ShieldCheck, Handshake, Zap, Tag, Star } from 'lucide-react';
+import { Home, ShieldCheck, Handshake, Zap, Star } from 'lucide-react';
 
 export const ProductFeatures = () => {
     const features = [

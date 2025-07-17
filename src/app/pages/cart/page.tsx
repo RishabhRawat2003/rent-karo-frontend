@@ -2,6 +2,7 @@
 import React from 'react'
 import { ShoppingBag, LogIn, Plus, Minus, Trash2 } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface CartItem {
     id: string
@@ -82,7 +83,9 @@ const CartPage = () => {
                     <div className="lg:col-span-2 space-y-4">
                         {cartItems.map(item => (
                             <div key={item.id} className="group flex items-center gap-4 p-6 border rounded-xl bg-white hover:shadow-lg transition-shadow duration-300">
-                                <img
+                                <Image
+                                    width={100}
+                                    height={100}
                                     src={item.image}
                                     alt={item.name}
                                     className="w-24 h-24 object-cover rounded-lg border"

@@ -1,4 +1,4 @@
-import { DollarSign, Users, Package, CalendarDays, ShoppingCart, Clock, ArrowUpRight, TrendingUp, Building2, ListChecks } from 'lucide-react';
+import { DollarSign, Users, Package, CalendarDays, ShoppingCart, Clock, ArrowUpRight, Building2, ListChecks } from 'lucide-react';
 
 export default function StatisticsPage() {
   // Mock data

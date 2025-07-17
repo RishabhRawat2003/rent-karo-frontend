@@ -27,6 +27,7 @@ export default function Page() {
     });
     const [showPassword, setShowPassword] = useState(false);
     const dispatch = useDispatch();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { loading } = useSelector((state: any) => state.user);
     const router = useRouter()
 
@@ -75,6 +76,7 @@ export default function Page() {
             toast.error(errorMessage);
             return;
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const response = await dispatch(signup(formData as any) as any);
         if (response?.error) {
             toast.error(response.error.message);

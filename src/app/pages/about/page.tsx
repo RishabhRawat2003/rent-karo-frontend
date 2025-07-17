@@ -134,7 +134,7 @@ const AboutPage = () => {
                     </h2>
 
                     <p className="text-gray-600 mb-8 text-lg">
-                        Whether you're looking to earn from unused items or find affordable rentals,
+                        Whether you&apos;re looking to earn from unused items or find affordable rentals,
                         RentKaro is your gateway to smarter ownership.
                     </p>
 

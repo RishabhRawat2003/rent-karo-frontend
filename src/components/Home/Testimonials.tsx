@@ -54,7 +54,7 @@ export const Testimonials = () => {
                         Why Renters & Owners Love Us
                     </h2>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        Join thousands who've transformed their rental experience
+                        Join thousands who&apos;ve transformed their rental experience
                     </p>
                 </div>
 
@@ -89,7 +89,7 @@ export const Testimonials = () => {
                             </div>
 
                             {/* Testimonial Text */}
-                            <p className="text-gray-600 mb-4">"{testimonial.text}"</p>
+                            <p className="text-gray-600 mb-4">&quot;{testimonial.text}&quot;</p>
 
                             {/* Badge & Features */}
                             <div className="flex justify-between items-center">

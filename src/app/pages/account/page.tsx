@@ -1,6 +1,6 @@
 "use client";
 import { LoadingSpinnerWithOverlay } from '@/components/Loading';
-import CommonModal from '@/components/Popup/CommonModal';
+import CommonModal from '@/components/popup/CommonModal';
 import { userDetails } from '@/store/userSlice';
 import { decodeToken } from '@/utils/decodeToken';
 import { TOKEN } from '@/utils/enum';
@@ -14,10 +14,22 @@ import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { toast } from 'react-toastify';
 
+interface User {
+    id: string;
+    fullName: string;
+    email: string;
+    role: string;
+    createdAt: string;
+    stats: {
+        totalOrders: number;
+        totalWishlist: number;
+        activeRentals: number;
+    }
+}
 
 export default function DashboardPage() {
     const [logoutModal, setLogoutModal] = useState(false);
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
     const router = useRouter()
@@ -29,8 +41,9 @@ export default function DashboardPage() {
         router.push("/")
     }
 
-    async function getUserDetails(id: any) {
-        const response = await dispatch(userDetails(id as any) as any)
+    async function getUserDetails() {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const response = await dispatch(userDetails() as any)
         if (response?.error) {
             toast.error(response.error.message)
         } else {
@@ -45,7 +58,7 @@ export default function DashboardPage() {
     }
 
     const renterItems = [
-        { id: 1, name: "My Listings", icon: <LayoutGrid size={24} />, onClick: () => handleRoute("/pages/account/my-listing")  },
+        { id: 1, name: "My Listings", icon: <LayoutGrid size={24} />, onClick: () => handleRoute("/pages/account/my-listing") },
         { id: 2, name: "Create Organization", icon: <Building size={24} />, onClick: () => handleRoute("/pages/account/organisation") },
         { id: 4, name: "Statistics", icon: <BarChart size={24} />, onClick: () => alert("Statistics") },
         { id: 5, name: "KYC Verification", icon: <AlertCircle size={24} />, onClick: () => handleRoute("/pages/account/kyc") },
@@ -75,7 +88,12 @@ export default function DashboardPage() {
             router.push("/")
         } else {
             const decodedToken = decodeToken(token);
-            getUserDetails(decodedToken.id)
+            if (decodedToken?.role !== "renter" && decodedToken?.role !== "buyer") {
+                toast.error("Please login first")
+                router.push("/")
+            } else {
+                getUserDetails()
+            }
         }
     }, [])
 
@@ -131,7 +149,7 @@ export default function DashboardPage() {
                                 </button>
                             </div>
                         </div>
-                        <p className="text-sm text-gray-500 mt-2">Joined {convertUTCtoIST2(user?.createdAt)}</p>
+                        <p className="text-sm text-gray-500 mt-2">Joined {convertUTCtoIST2(user?.createdAt as string)}</p>
                     </div>
                 </div>
 
