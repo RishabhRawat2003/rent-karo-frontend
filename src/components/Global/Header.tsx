@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import { usePathname } from "next/navigation";
 import { TOKEN } from '@/utils/enum';
 import { decodeToken } from '@/utils/decodeToken';
-
 const Header = () => {
     const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
