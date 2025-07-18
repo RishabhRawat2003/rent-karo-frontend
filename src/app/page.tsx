@@ -1,4 +1,3 @@
-
 import { FAQ } from "@/components/home/Faq";
 import HeroSection from "@/components/home/HeroSection";
 import { HowItWorks } from "@/components/home/HowItWorks";
