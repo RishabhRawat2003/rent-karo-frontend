@@ -20,7 +20,7 @@ interface AdminSidebarProps {
     setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const AdminSidebar = ({ isCollapsed, setIsCollapsed }: AdminSidebarProps) => {
+function AdminSidebar ({ isCollapsed, setIsCollapsed }: AdminSidebarProps) {
     const [activeTab, setActiveTab] = useState('statistics');
     const router = useRouter();
 
