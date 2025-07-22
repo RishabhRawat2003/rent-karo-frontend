@@ -22,6 +22,18 @@ const createProduct = createAsyncThunk("product/create", async (data) => {
     }
 })
 
+const getAllProducts = createAsyncThunk("product/get-all-products", async (data) => {
+    try {
+        const response = await axios.post(`${backend}/product/get-all`, data)
+        return response.data
+    } catch (error) {
+        if (error.response) {
+            throw error.response.data; // Handle server-side error
+        }
+        throw error.message || "An unexpected error occurred"; // Handle client-side or network error
+    }
+})
+
 const getProductsByOrganisation = createAsyncThunk("product/get-org-products", async (payload) => {
     try {
         const response = await axios.post(`${backend}/product/get-products-by-organisation/${payload.id}`, payload.pagination, {
@@ -96,6 +108,18 @@ const productSlice = createSlice({
                 state.loading = false;
                 state.error = action.error.message || "An error occurred";
             })
+            .addCase(getAllProducts.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getAllProducts.fulfilled, (state, action) => {
+                state.product = action.payload.product;
+                state.loading = false;
+            })
+            .addCase(getAllProducts.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || "An error occurred";
+            })
             .addCase(getProductsByOrganisation.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -134,5 +158,5 @@ const productSlice = createSlice({
     },
 });
 
-export { createProduct, getProductsByOrganisation, removeSingleProduct, updateProduct };
+export { createProduct, getProductsByOrganisation, removeSingleProduct, updateProduct, getAllProducts };
 export default productSlice.reducer;
