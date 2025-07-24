@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import { LoadingSpinnerWithOverlay } from "@/components/Loading";
+import Link from "next/link";
 
 interface RentalPricing {
     day: number;
@@ -20,6 +21,7 @@ interface Product {
     title: string;
     subTitle: string;
     category: string;
+    sub_category: string;
     images: string[];
     rentalPricing: RentalPricing[];
     stocks: number;
@@ -159,7 +161,7 @@ function ProductCard({ product }: { product: Product }) {
                         <p className="text-gray-600 text-sm mt-1 line-clamp-1">{product.subTitle}</p>
                     </div>
                     <span className="text-xs font-medium px-2 py-1 rounded-full" style={{ backgroundColor: '#eff6ff', color: '#1447e6' }}>
-                        {product.category}
+                        {product.sub_category}
                     </span>
                 </div>
 
@@ -193,9 +195,9 @@ function ProductCard({ product }: { product: Product }) {
                         <span className={`w-2 h-2 rounded-full mr-1 ${product.stocks > 0 ? 'bg-green-500' : 'bg-red-500'}`}></span>
                         {product.stocks > 0 ? `${product.stocks} available` : 'Out of stock'}
                     </span>
-                    <button className="font-medium px-3 py-1.5 rounded-md hover:underline" style={{ color: '#1447e6' }}>
+                    <Link href={`/pages/rent/${product._id}`} className="font-medium px-3 py-1.5 rounded-md hover:underline" style={{ color: '#1447e6' }}>
                         View Details
-                    </button>
+                    </Link>
                 </div>
             </div>
         </div>

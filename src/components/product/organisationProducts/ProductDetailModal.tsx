@@ -124,6 +124,10 @@ function ProductDetailModal({ currentProduct, setCurrentProduct,setUpdatedProduc
                                         <p className="font-medium">{currentProduct.category || '-'}</p>
                                     </div>
                                     <div>
+                                        <p className="text-sm text-gray-600">Sub Category</p>
+                                        <p className="font-medium">{currentProduct.sub_category || '-'}</p>
+                                    </div>
+                                    <div>
                                         <p className="text-sm text-gray-600">Available Stock</p>
                                         <p className="font-medium">{currentProduct.stocks}</p>
                                     </div>

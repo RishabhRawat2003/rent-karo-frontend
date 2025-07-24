@@ -13,7 +13,7 @@ interface UpdateProductPopupProps {
     updateLoading: boolean
 }
 
-function UpdateProductPopup({ updatedProduct, setUpdatedProduct, newPreviewImages, handleUpdateProduct,updateLoading, setNewPreviewImages, setNewImages }: UpdateProductPopupProps) {
+function UpdateProductPopup({ updatedProduct, setUpdatedProduct, newPreviewImages, handleUpdateProduct, updateLoading, setNewPreviewImages, setNewImages }: UpdateProductPopupProps) {
     return (
         <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
             <div className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-xl">
@@ -157,12 +157,49 @@ function UpdateProductPopup({ updatedProduct, setUpdatedProduct, newPreviewImage
                                 <label className="block mb-2 text-sm font-medium text-gray-700">
                                     Category*
                                 </label>
+                                <select
+                                    value={updatedProduct.category}
+                                    onChange={(e) =>
+                                        setUpdatedProduct({
+                                            ...updatedProduct,
+                                            category: e.target.value,
+                                        })
+                                    }
+                                    className="w-full p-3 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                                    required
+                                >
+                                    <option value="" disabled>Select a category</option>
+                                    <option value="clothing">Clothing</option>
+                                    <option value="shoes">Shoes</option>
+                                    <option value="electronics">Electronics</option>
+                                    <option value="smartphones">Smartphones</option>
+                                    <option value="laptops">Laptops</option>
+                                    <option value="pc">PCs</option>
+                                    <option value="gaming-accessories">Gaming Accessories</option>
+                                    <option value="furniture">Furniture</option>
+                                    <option value="camera">Cameras</option>
+                                    <option value="tools">Tools & Equipment</option>
+                                    <option value="vehicles">Vehicles</option>
+                                    <option value="books">Books</option>
+                                    <option value="musical-instruments">Musical Instruments</option>
+                                    <option value="sports">Sports & Fitness</option>
+                                    <option value="home-appliances">Home Appliances</option>
+                                    <option value="baby-products">Baby Products</option>
+                                    <option value="travel">Travel & Luggage</option>
+                                    <option value="others">Others</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block mb-2 text-sm font-medium text-gray-700">
+                                    Sub Category*
+                                </label>
                                 <input
                                     type="text"
-                                    value={updatedProduct.category}
+                                    placeholder='Enter Your Sub Category'
+                                    value={updatedProduct.sub_category}
                                     onChange={(e) => setUpdatedProduct({
                                         ...updatedProduct,
-                                        category: e.target.value
+                                        sub_category: e.target.value
                                     })}
                                     className="w-full p-3 border rounded-lg focus:ring-blue-500 focus:border-blue-500"
                                     required
@@ -170,7 +207,7 @@ function UpdateProductPopup({ updatedProduct, setUpdatedProduct, newPreviewImage
                             </div>
 
                             <div>
-                                <label className="block mb-2 text-sm font-medium text-gray-700">
+                                <label className="block mb-2 col-span-2 text-sm font-medium text-gray-700">
                                     Stock Quantity*
                                 </label>
                                 <input

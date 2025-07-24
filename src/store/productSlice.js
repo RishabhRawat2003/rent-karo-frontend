@@ -82,6 +82,34 @@ const updateProduct = createAsyncThunk("product/update-product", async (payload)
     }
 })
 
+const getSingleProduct = createAsyncThunk("product/get-product", async (id) => {
+    try {
+        const response = await axios.get(`${backend}/product/get/${id}`)
+        return response.data
+    } catch (error) {
+        if (error.response) {
+            throw error.response.data; // Handle server-side error
+        }
+        throw error.message || "An unexpected error occurred"; // Handle client-side or network error
+    }
+})
+
+const getCategoryProduct = createAsyncThunk("product/get-category-product", async (data) => {
+    try {
+        const response = await axios.post(`${backend}/product/product-category`, data, {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(localStorage.getItem(TOKEN))}`,
+            }
+        })
+        return response.data
+    } catch (error) {
+        if (error.response) {
+            throw error.response.data; // Handle server-side error
+        }
+        throw error.message || "An unexpected error occurred"; // Handle client-side or network error
+    }
+})
+
 // Define the initial state
 const initialState = {
     product: null,
@@ -155,8 +183,32 @@ const productSlice = createSlice({
                 state.loading = false;
                 state.error = action.error.message || "An error occurred";
             })
+            .addCase(getSingleProduct.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getSingleProduct.fulfilled, (state, action) => {
+                state.product = action.payload.product;
+                state.loading = false;
+            })
+            .addCase(getSingleProduct.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || "An error occurred";
+            })
+            .addCase(getCategoryProduct.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getCategoryProduct.fulfilled, (state, action) => {
+                state.product = action.payload.product;
+                state.loading = false;
+            })
+            .addCase(getCategoryProduct.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || "An error occurred";
+            })
     },
 });
 
-export { createProduct, getProductsByOrganisation, removeSingleProduct, updateProduct, getAllProducts };
+export { createProduct, getProductsByOrganisation, removeSingleProduct, updateProduct, getAllProducts, getSingleProduct, getCategoryProduct };
 export default productSlice.reducer;

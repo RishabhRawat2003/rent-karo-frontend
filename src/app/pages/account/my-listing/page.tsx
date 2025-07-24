@@ -39,6 +39,7 @@ export interface Product {
     rentalPricing: RentalPricing[];
     specifications: Specification[];
     category: string;
+    sub_category: string;
     organisationId: Organisation;
     blockedByAdmin: boolean;
     createdAt: string;
@@ -167,6 +168,7 @@ export default function ProductsPage() {
         formData.append('rentalPricing', JSON.stringify(updatedProduct.rentalPricing));
         formData.append('specifications', JSON.stringify(updatedProduct.specifications));
         formData.append('category', updatedProduct.category);
+        formData.append('sub_category', updatedProduct.sub_category);
         formData.append('existingImages', JSON.stringify(updatedProduct.images))
         formData.append('organisationId', organisationId || '');
         if (newImages.length > 0) {

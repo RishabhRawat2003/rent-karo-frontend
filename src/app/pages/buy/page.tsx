@@ -6,12 +6,14 @@ import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import { LoadingSpinnerWithOverlay } from "@/components/Loading";
+import Link from "next/link";
 
 interface Product {
   _id: string;
   title: string;
   subTitle: string;
   category: string;
+  sub_category: string;
   images: string[];
   realSellingPrice: number;
   sellingPrice: number;
@@ -159,7 +161,7 @@ function ProductCard({ product }: { product: Product }) {
             className="text-xs font-medium text-center px-2 py-1 rounded-full" 
             style={{ backgroundColor: '#eff6ff', color: '#1447e6' }}
           >
-            {product.category}
+            {product.sub_category}
           </span>
         </div>
 
@@ -193,9 +195,9 @@ function ProductCard({ product }: { product: Product }) {
             <span className={`w-2 h-2 rounded-full mr-1 ${product.stocks > 0 ? 'bg-green-500' : 'bg-red-500'}`}></span>
             {product.stocks > 0 ? `${product.stocks} available` : 'Out of stock'}
           </span>
-          <button className="font-medium px-3 py-1.5 rounded-md hover:underline" style={{ color: '#1447e6' }}>
+          <Link href={`/pages/buy/${product._id}`} className="font-medium px-3 py-1.5 rounded-md hover:underline" style={{ color: '#1447e6' }}>
             View Details
-          </button>
+          </Link>
         </div>
       </div>
     </div>

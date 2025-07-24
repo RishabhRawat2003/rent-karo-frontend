@@ -38,6 +38,7 @@ interface ProductFormData {
   rentalPricing: RentalPricing[];
   specifications: Specification[];
   category: string;
+  sub_category: string;
   organisationId: string;
 }
 
@@ -54,6 +55,7 @@ const CreateProductForm = () => {
     rentalPricing: [{ day: 0, realPrice: 0, discount: 0, discountPrice: 0 }],
     specifications: [{ title: '', data: [{ key: '', value: '' }] }],
     category: '',
+    sub_category: '',
     organisationId: '',
   });
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -216,6 +218,7 @@ const CreateProductForm = () => {
     formData2.append('rentalPricing', JSON.stringify(formData.rentalPricing))
     formData2.append('specifications', JSON.stringify(formData.specifications))
     formData2.append('category', formData.category)
+    formData2.append('sub_category', formData.sub_category)
     formData2.append('organisationId', formData.organisationId)
 
     imageFiles.forEach((file) => {
@@ -329,15 +332,33 @@ const CreateProductForm = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Category*</label>
-                  <input
-                    type="text"
+                  <select
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
-                    placeholder="Product category"
-                  />
+                  >
+                    <option value="" disabled>Select a category</option>
+                    <option value="clothing">Clothing</option>
+                    <option value="shoes">Shoes</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="smartphones">Smartphones</option>
+                    <option value="laptops">Laptops</option>
+                    <option value="pc">PCs</option>
+                    <option value="gaming-accessories">Gaming Accessories</option>
+                    <option value="furniture">Furniture</option>
+                    <option value="camera">Cameras</option>
+                    <option value="tools">Tools & Equipment</option>
+                    <option value="vehicles">Vehicles</option>
+                    <option value="books">Books</option>
+                    <option value="musical-instruments">Musical Instruments</option>
+                    <option value="sports">Sports & Fitness</option>
+                    <option value="home-appliances">Home Appliances</option>
+                    <option value="baby-products">Baby Products</option>
+                    <option value="travel">Travel & Luggage</option>
+                    <option value="others">Others</option>
+                  </select>
                 </div>
 
                 <div>
@@ -350,6 +371,18 @@ const CreateProductForm = () => {
                     onChange={handleChange}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Sub Category*</label>
+                  <input
+                    type="text"
+                    name="sub_category"
+                    value={formData.sub_category}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    required
+                    placeholder="Product Sub Category"
                   />
                 </div>
                 <div className="flex items-center">
