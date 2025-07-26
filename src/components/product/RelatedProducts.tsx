@@ -150,7 +150,6 @@ function ProductCard({ product }: { product: Product }) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function RelatedProducts({ category }: any) {
-    console.log(category);
     const [loading, setLoading] = useState(false);
     const [products, setProducts] = useState<Product[]>([]);
     const dispatch = useDispatch();

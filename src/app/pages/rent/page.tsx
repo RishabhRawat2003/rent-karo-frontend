@@ -1,7 +1,7 @@
 "use client";
 
 import { getAllProducts } from "@/store/productSlice";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import Image from "next/image";
@@ -45,17 +45,35 @@ export default function ProductsPage() {
         totalProducts: 0,
     });
     const [loading, setLoading] = useState(true);
+    const [searchInput, setSearchInput] = useState("");
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [sortBy, setSortBy] = useState("");
     const dispatch = useDispatch();
 
-    async function getProducts() {
+    // Debounce hook for search input
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchTerm(searchInput);
+        }, 500); // 500ms delay
+
+        return () => clearTimeout(timer);
+    }, [searchInput]);
+
+    const getProducts = useCallback(async () => {
         setLoading(true);
         try {
             const data = {
                 ...pagination,
                 wanted_to_sell: false,
+                searchedName: '',
+                category: ''
             };
+            if (debouncedSearchTerm.trim()) data.searchedName = debouncedSearchTerm.trim();
+            if (selectedCategory) data.category = selectedCategory;
+
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const response = await dispatch(getAllProducts(data as any) as any)
+            const response = await dispatch(getAllProducts(data as any) as any);
             if (response?.error) {
                 toast.error(response.error.message);
             } else {
@@ -71,11 +89,66 @@ export default function ProductsPage() {
             toast.error('Failed to load products');
         }
         setLoading(false);
-    }
+    }, [dispatch, pagination.page, pagination.limit, debouncedSearchTerm, selectedCategory]);
 
     useEffect(() => {
         getProducts();
-    }, [pagination.page]);
+    }, [getProducts]);
+
+    // Reset to first page when search term or category changes
+    useEffect(() => {
+        if (debouncedSearchTerm !== searchInput) return; // Don't reset page during debounce
+        setPagination(prev => ({ ...prev, page: 1 }));
+    }, [debouncedSearchTerm, selectedCategory]);
+
+    const { sortedProducts, paginatedProducts, totalProducts } = useMemo(() => {
+        let filtered = [...products];
+
+        // Apply sorting
+        if (sortBy) {
+            filtered.sort((a, b) => {
+                const aBestDeal = a.rentalPricing.reduce((prev, current) =>
+                    (current.discountPrice < prev.discountPrice) ? current : prev
+                );
+                const bBestDeal = b.rentalPricing.reduce((prev, current) =>
+                    (current.discountPrice < prev.discountPrice) ? current : prev
+                );
+
+                switch (sortBy) {
+                    case "price_low_to_high":
+                        return aBestDeal.discountPrice - bBestDeal.discountPrice;
+                    case "price_high_to_low":
+                        return bBestDeal.discountPrice - aBestDeal.discountPrice;
+                    case "newest_first":
+                        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+                    default:
+                        return 0;
+                }
+            });
+        }
+
+        // Calculate pagination
+        const startIndex = (pagination.page - 1) * pagination.limit;
+        const endIndex = startIndex + pagination.limit;
+        const paginated = filtered.slice(startIndex, endIndex);
+        const totalPages = Math.ceil(filtered.length / pagination.limit);
+
+        return {
+            sortedProducts: filtered,
+            paginatedProducts: paginated,
+            totalProducts: filtered.length,
+            totalPages
+        };
+    }, [products, sortBy, pagination.page, pagination.limit]);
+
+    useEffect(() => {
+        const totalPages = Math.ceil(totalProducts / pagination.limit);
+        setPagination(prev => ({
+            ...prev,
+            totalPages,
+            totalProducts
+        }));
+    }, [totalProducts, pagination.limit]);
 
     const handlePageChange = (newPage: number) => {
         if (newPage >= 1 && newPage <= pagination.totalPages) {
@@ -83,39 +156,141 @@ export default function ProductsPage() {
         }
     };
 
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchInput(e.target.value);
+    };
+
+    const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedCategory(e.target.value);
+    };
+
+    const handleSortChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSortBy(e.target.value);
+        setPagination(prev => ({ ...prev, page: 1 }));
+    };
+
+    const clearFilters = () => {
+        setSearchInput("");
+        setDebouncedSearchTerm("");
+        setSelectedCategory("");
+        setSortBy("");
+        setPagination(prev => ({ ...prev, page: 1 }));
+    };
+
     return (
         <div className="min-h-screen pt-16" style={{ backgroundColor: '#eff6ff' }}>
             <div className="container mx-auto px-4 py-8">
-                <div className="flex flex-col md:justify-between md:flex-row gap-6 md:gap-0 md:items-center mb-8">
+                <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6 mb-8">
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-800">All Rental Products</h2>
-                        <p className="text-gray-600 mt-1">Professional equipment available for rent</p>
+                        <h2 className="text-2xl font-bold text-gray-800">
+                            All Rental Products
+                        </h2>
+                        <p className="text-gray-600 mt-1">
+                            Professional equipment available for rent
+                        </p>
                     </div>
-                    <div className="flex items-center space-x-2">
+
+                    <div className="flex flex-wrap items-center space-x-2 gap-3 sm:gap-0">
+                        {/* Search box with debouncing indicator */}
+                        <div className="relative">
+                            <input
+                                type="text"
+                                placeholder="Search products..."
+                                value={searchInput}
+                                onChange={handleSearchChange}
+                                className="px-3 py-1.5 pr-8 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+                            />
+                        </div>
+
+                        {/* Category filter */}
+                        <select
+                            value={selectedCategory}
+                            onChange={handleCategoryChange}
+                            className="bg-white border border-gray-300 rounded-md px-3 py-1.5"
+                        >
+                            <option value="">All Categories</option>
+                            <option value="clothing">Clothing</option>
+                            <option value="shoes">Shoes</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="smartphones">Smartphones</option>
+                            <option value="laptops">Laptops</option>
+                            <option value="pc">PCs</option>
+                            <option value="gaming-accessories">Gaming Accessories</option>
+                            <option value="furniture">Furniture</option>
+                            <option value="camera">Cameras</option>
+                            <option value="tools">Tools & Equipment</option>
+                            <option value="vehicles">Vehicles</option>
+                            <option value="books">Books</option>
+                            <option value="musical-instruments">Musical Instruments</option>
+                            <option value="sports">Sports & Fitness</option>
+                            <option value="home-appliances">Home Appliances</option>
+                            <option value="baby-products">Baby Products</option>
+                            <option value="travel">Travel & Luggage</option>
+                            <option value="others">Others</option>
+                        </select>
+
+                        {/* Sort by */}
                         <span className="text-gray-600">Sort by:</span>
-                        <select className="bg-white border border-gray-300 rounded-md px-3 py-1.5">
-                            <option>Most Popular</option>
-                            <option>Price: Low to High</option>
-                            <option>Price: High to Low</option>
-                            <option>Newest First</option>
+                        <select
+                            value={sortBy}
+                            onChange={handleSortChange}
+                            className="bg-white border border-gray-300 rounded-md px-3 py-1.5"
+                        >
+                            <option value="">Default</option>
+                            <option value="price_low_to_high">Price: Low to High</option>
+                            <option value="price_high_to_low">Price: High to Low</option>
+                            <option value="newest_first">Newest First</option>
                         </select>
                     </div>
                 </div>
+
+                {searchInput !== debouncedSearchTerm && (
+                    <LoadingSpinnerWithOverlay />
+                )}
 
                 {loading ? (
                     <LoadingSpinnerWithOverlay />
                 ) : (
                     <>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                            {products.map((product) => (
-                                <ProductCard key={product._id} product={product} />
-                            ))}
-                        </div>
+                        {paginatedProducts.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-16">
+                                <div className="text-center">
+                                    <div className="w-24 h-24 mx-auto mb-4 bg-gray-200 rounded-full flex items-center justify-center">
+                                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2M4 13h2m13-8V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                        </svg>
+                                    </div>
+                                    <h3 className="text-xl font-semibold text-gray-800 mb-2">No Products Available</h3>
+                                    <p className="text-gray-600 mb-4">
+                                        {debouncedSearchTerm || selectedCategory
+                                            ? "No products match your current filters. Try adjusting your search or category selection."
+                                            : "There are currently no rental products available."
+                                        }
+                                    </p>
+                                    {(debouncedSearchTerm || selectedCategory || sortBy) && (
+                                        <button
+                                            onClick={clearFilters}
+                                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                        >
+                                            Clear Filters
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                    {paginatedProducts.map((product) => (
+                                        <ProductCard key={product._id} product={product} />
+                                    ))}
+                                </div>
 
-                        <PaginationControls
-                            pagination={pagination}
-                            onPageChange={handlePageChange}
-                        />
+                                <PaginationControls
+                                    pagination={pagination}
+                                    onPageChange={handlePageChange}
+                                />
+                            </>
+                        )}
                     </>
                 )}
             </div>
@@ -227,8 +402,8 @@ function PaginationControls({
                     onClick={() => onPageChange(pagination.page - 1)}
                     disabled={pagination.page === 1}
                     className={`px-4 py-2 rounded-md ${pagination.page === 1
-                            ? 'bg-gray-200 cursor-not-allowed text-gray-400'
-                            : 'bg-white border border-gray-300 hover:bg-gray-100 text-gray-700'
+                        ? 'bg-gray-200 cursor-not-allowed text-gray-400'
+                        : 'bg-white border border-gray-300 hover:bg-gray-100 text-gray-700'
                         }`}
                 >
                     Previous
@@ -252,8 +427,8 @@ function PaginationControls({
                                 key={pageNum}
                                 onClick={() => onPageChange(pageNum)}
                                 className={`w-10 h-10 rounded-md ${pagination.page === pageNum
-                                        ? 'text-white font-bold'
-                                        : 'bg-white border border-gray-300 hover:bg-gray-100 text-gray-700'
+                                    ? 'text-white font-bold'
+                                    : 'bg-white border border-gray-300 hover:bg-gray-100 text-gray-700'
                                     }`}
                                 style={{
                                     backgroundColor: pagination.page === pageNum ? '#1447e6' : 'white',
@@ -270,8 +445,8 @@ function PaginationControls({
                     onClick={() => onPageChange(pagination.page + 1)}
                     disabled={pagination.page >= pagination.totalPages}
                     className={`px-4 py-2 rounded-md ${pagination.page >= pagination.totalPages
-                            ? 'bg-gray-200 cursor-not-allowed text-gray-400'
-                            : 'bg-white border border-gray-300 hover:bg-gray-100 text-gray-700'
+                        ? 'bg-gray-200 cursor-not-allowed text-gray-400'
+                        : 'bg-white border border-gray-300 hover:bg-gray-100 text-gray-700'
                         }`}
                 >
                     Next

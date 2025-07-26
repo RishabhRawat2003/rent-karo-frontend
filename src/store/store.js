@@ -3,13 +3,15 @@ import userReducers from "./userSlice";
 import adminReducers from "./adminSlice";
 import organisationReducers from "./organisationSlice";
 import kycReducers from "./kycSlice";
+import reviewReducers from "./reviewSlice";
 
 const store = configureStore({
     reducer: {
         user: userReducers,
         admin: adminReducers,
         kyc: kycReducers,
-        organisation: organisationReducers
+        organisation: organisationReducers,
+        review: reviewReducers
     },
 });
 

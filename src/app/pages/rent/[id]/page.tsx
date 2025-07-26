@@ -1,15 +1,21 @@
 "use client"
 import { getSingleProduct } from "@/store/productSlice";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import { LoadingSpinnerWithOverlay } from "@/components/Loading";
-import { FaCheckCircle, FaShoppingCart, FaPlus, FaMinus, FaCalendarAlt, FaStar, FaHeart, FaShareAlt, FaUserCircle } from "react-icons/fa";
+import { FaCheckCircle, FaShoppingCart, FaPlus, FaMinus, FaCalendarAlt, FaStar, FaHeart, FaShareAlt } from "react-icons/fa";
+import { MdDeleteOutline } from "react-icons/md";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { getInitials } from "@/utils/GetInitials";
 import RelatedProducts from "@/components/product/RelatedProducts";
+import { createReview, getAllReviews, removeSingleReview } from "@/store/reviewSlice";
+import { decodeToken } from "@/utils/decodeToken";
+import { TOKEN } from "@/utils/enum";
+import { convertUTCtoIST2 } from "@/utils/timeConvertor";
+import CommonModal from "@/components/popup/CommonModal";
 
 
 interface RentalPricing {
@@ -40,11 +46,15 @@ interface SpecificationGroup {
 }
 
 interface Review {
-    id: string;
-    name: string;
+    _id: string;
     rating: number;
-    date: string;
     comment: string;
+    createdAt: string;
+    user: {
+        _id: string;
+        fullName: string;
+        profilePicture: string;
+    }
 }
 
 export interface Product {
@@ -54,6 +64,7 @@ export interface Product {
     description: string;
     category: string;
     sub_category: string;
+    wanted_to_sell: boolean;
     images: string[];
     rentalPricing: RentalPricing[];
     stocks: number;
@@ -75,12 +86,14 @@ export default function Page() {
     const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'reviews'>('description');
     const [userReview, setUserReview] = useState({
         rating: 0,
-        comment: "",
-        name: "You"
+        comment: ""
     });
     const [reviews, setReviews] = useState<Review[]>([]);
+    const [loggedInUser, setLoggedInUser] = useState('');
+    const [deleteReviewId, setDeleteReviewId] = useState('');
     const dispatch = useDispatch();
     const { id } = useParams();
+    const router = useRouter()
 
     const increaseQty = () => {
         toast.dismiss()
@@ -93,39 +106,37 @@ export default function Page() {
     }
     const decreaseQty = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
 
-    const sampleReviews: Review[] = [
-        {
-            id: "1",
-            name: "Alex Johnson",
-            rating: 5,
-            date: "2023-10-15",
-            comment: "This camera lens exceeded my expectations. The image quality is outstanding and the rental process was smooth."
-        },
-        {
-            id: "2",
-            name: "Sarah Williams",
-            rating: 4,
-            date: "2023-09-28",
-            comment: "Good quality lens, but the auto-focus was a bit slow in low light conditions. Overall a good rental experience."
-        },
-        {
-            id: "3",
-            name: "Michael Chen",
-            rating: 5,
-            date: "2023-09-12",
-            comment: "Perfect for my photography project. The lens arrived in excellent condition and was exactly as described."
-        },
-        {
-            id: "4",
-            name: "Emily Rodriguez",
-            rating: 3,
-            date: "2023-08-30",
-            comment: "Decent lens for the price, but I expected better sharpness at wider apertures. Delivery was fast though."
+    async function getReviews() {
+        setLoading(true);
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const response = await dispatch(getAllReviews(id as any) as any);
+            if (response?.error) {
+                console.error(response.error);
+            } else {
+                setReviews(response.payload.reviews);
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Failed to load reviews');
         }
-    ];
+        setLoading(false)
+    }
 
-    const handleReviewSubmit = (e: React.FormEvent) => {
+    async function createReviews(e: React.FormEvent) {
         e.preventDefault();
+        setLoading(true);
+        const token = JSON.parse(localStorage.getItem(TOKEN) as string);
+        if (!token) {
+            toast.error('You are not logged in');
+            router.push('/pages/login')
+            return
+        }
+        const decodedToken = decodeToken(token)
+        if (decodedToken.role === 'renter') {
+            toast.error('You are not allowed to create a review');
+            return
+        }
 
         if (userReview.rating === 0) {
             toast.error("Please select a rating");
@@ -137,30 +148,54 @@ export default function Page() {
             return;
         }
 
-        const newReview: Review = {
-            id: Date.now().toString(),
-            name: userReview.name,
-            rating: userReview.rating,
-            date: new Date().toISOString().split('T')[0],
-            comment: userReview.comment
-        };
-
-        setReviews(prev => [newReview, ...prev]);
-
-        // Reset form
-        setUserReview({
-            rating: 0,
-            comment: "",
-            name: "You"
-        });
-
-        toast.success("Review submitted successfully!");
-    };
-
+        try {
+            const data = {
+                product: id,
+                user: decodedToken.id,
+                rating: userReview.rating,
+                comment: userReview.comment
+            }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const response = await dispatch(createReview(data as any) as any);
+            if (response?.error) {
+                console.log(response.error);
+            } else {
+                setUserReview({
+                    rating: 0,
+                    comment: ""
+                })
+                toast.success('Review created successfully!');
+                getReviews();
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Failed to load reviews');
+        }
+        setLoading(false)
+    }
 
     const handleAddToCart = () => {
         toast.success('Product added to cart successfully!');
     };
+
+    async function handleDeleteReview() {
+        setLoading(true);
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const response = await dispatch(removeSingleReview(deleteReviewId as any) as any);
+            if (response?.error) {
+                toast.error(response.error.message);
+            } else {
+                toast.success('Review deleted successfully!');
+                setDeleteReviewId('');
+                getReviews();
+            }
+        } catch (error) {
+            console.log(error);
+            toast.error('Failed to delete review');
+        }
+        setLoading(false);
+    }
 
     async function getProduct() {
         setLoading(true);
@@ -174,7 +209,6 @@ export default function Page() {
                 // Set the first rental option as selected by default
                 if (response.payload.product?.rentalPricing?.length > 0) {
                     setSelectedRentalOption(response.payload.product.rentalPricing[0]._id);
-                    setReviews(sampleReviews);
                 }
             }
         } catch (error) {
@@ -185,7 +219,15 @@ export default function Page() {
     }
 
     useEffect(() => {
-        if (id) getProduct();
+        const token = JSON.parse(localStorage.getItem(TOKEN) as string);
+        if (token) {
+            const decodedToken = decodeToken(token);
+            setLoggedInUser(decodedToken.id);
+        }
+        if (id) {
+            getProduct()
+            getReviews()
+        }
     }, [id]);
 
     const handlePrevImage = () => {
@@ -323,18 +365,34 @@ export default function Page() {
                                         {/* Rating */}
                                         <div className="flex items-center mb-4">
                                             <div className="flex items-center">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <FaStar
-                                                        key={i}
-                                                        className={`text-sm ${i < (singleProduct.rating || 4)
-                                                            ? "text-yellow-400 fill-current"
-                                                            : "text-gray-300"
-                                                            }`}
-                                                    />
-                                                ))}
+                                                {(() => {
+                                                    // Calculate average rating from reviews array
+                                                    const averageRating = reviews?.length > 0
+                                                        ? reviews?.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+                                                        : 0;
+
+                                                    // Round to nearest 0.5 for half-star display
+                                                    const displayRating = Math.round(averageRating * 2) / 2;
+
+                                                    return [...Array(5)].map((_, i) => {
+                                                        const isFullStar = i < Math.floor(displayRating);
+                                                        const isHalfStar = i === Math.floor(displayRating) && displayRating % 1 === 0.5;
+
+                                                        return (
+                                                            <FaStar
+                                                                key={i}
+                                                                className={`text-sm ${isFullStar || isHalfStar
+                                                                    ? "text-yellow-400 fill-current"
+                                                                    : "text-gray-300"
+                                                                    }`}
+                                                            />
+                                                        );
+                                                    });
+                                                })()}
+
                                             </div>
                                             <span className="ml-2 text-sm text-gray-600">
-                                                {singleProduct.reviews || 24} reviews
+                                                {reviews.length} reviews
                                             </span>
                                         </div>
                                     </div>
@@ -457,7 +515,7 @@ export default function Page() {
                                             }`}
                                     >
                                         <FaShoppingCart className="mr-2" />
-                                        Rent Now
+                                        {singleProduct?.wanted_to_sell ? 'Buy Now' : 'Rent Now'}
                                     </button>
                                     <div className="flex flex-col items-center gap-2 space-x-3 sm:flex-row lg:flex-col xl:flex-row xl:gap-0">
                                         {/* Quantity Controls */}
@@ -586,19 +644,31 @@ export default function Page() {
                                             </h2>
                                             <div className="flex items-center">
                                                 <div className="flex text-yellow-400 mr-2">
-                                                    {[...Array(5)].map((_, i) => (
-                                                        <FaStar
-                                                            key={i}
-                                                            className={`text-lg ${i < Math.floor(4.2)
-                                                                ? "fill-current"
-                                                                : i < 4.2
-                                                                    ? "text-yellow-400"
-                                                                    : "text-gray-300"
-                                                                }`}
-                                                        />
-                                                    ))}
+                                                    {(() => {
+                                                        // Calculate average rating from reviews array
+                                                        const averageRating = reviews?.length > 0
+                                                            ? reviews?.reduce((sum, review) => sum + review.rating, 0) / reviews.length
+                                                            : 0;
+
+                                                        // Round to nearest 0.5 for half-star display
+                                                        const displayRating = Math.round(averageRating * 2) / 2;
+
+                                                        return [...Array(5)].map((_, i) => {
+                                                            const isFullStar = i < Math.floor(displayRating);
+                                                            const isHalfStar = i === Math.floor(displayRating) && displayRating % 1 === 0.5;
+
+                                                            return (
+                                                                <FaStar
+                                                                    key={i}
+                                                                    className={`text-sm ${isFullStar || isHalfStar
+                                                                        ? "text-yellow-400 fill-current"
+                                                                        : "text-gray-300"
+                                                                        }`}
+                                                                />
+                                                            );
+                                                        });
+                                                    })()}
                                                 </div>
-                                                <span className="text-gray-700 font-medium">4.2 out of 5</span>
                                                 <span className="text-gray-500 ml-2">({reviews.length} reviews)</span>
                                             </div>
                                         </div>
@@ -615,32 +685,43 @@ export default function Page() {
                                         </div>
                                     </div>
 
+                                    {
+                                        deleteReviewId && <CommonModal isOpen={deleteReviewId !== ""} closeModal={() => setDeleteReviewId("")} type="warning" onCancel={() => setDeleteReviewId("")} title="Delete Review" description="Are you sure you want to delete this review?" onAccept={handleDeleteReview} />
+                                    }
+
                                     {/* Reviews List */}
                                     <div className="space-y-6">
                                         {reviews.map(review => (
-                                            <div key={review.id} className="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
+                                            <div key={review?._id} className="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
                                                 <div className="flex items-start">
                                                     <div className="flex-shrink-0 mr-4">
                                                         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                                                            <FaUserCircle className="text-gray-400 text-2xl" />
+                                                            {
+                                                                review?.user?.profilePicture
+                                                                    ? <Image src={review?.user?.profilePicture} alt={review?.user?.fullName} width={100} height={100} className="w-10 h-10 rounded-full" />
+                                                                    : <span className="font-semibold">{getInitials(review?.user?.fullName)}</span>
+                                                            }
                                                         </div>
                                                     </div>
                                                     <div className="flex-1">
                                                         <div className="flex flex-col md:flex-row md:items-center justify-between">
-                                                            <h4 className="font-medium text-gray-900">{review.name}</h4>
+                                                            <h4 className="font-medium text-gray-900">{review?.user?.fullName}</h4>
                                                             <div className="flex items-center mt-1 md:mt-0">
                                                                 <div className="flex text-yellow-400">
                                                                     {[...Array(5)].map((_, i) => (
                                                                         <FaStar
                                                                             key={i}
-                                                                            className={`text-sm ${i < review.rating
+                                                                            className={`text-sm ${i < review?.rating
                                                                                 ? "fill-current"
                                                                                 : "text-gray-300"
                                                                                 }`}
                                                                         />
                                                                     ))}
                                                                 </div>
-                                                                <span className="text-xs text-gray-500 ml-2">{review.date}</span>
+                                                                <span className="text-xs text-gray-500 ml-2">{convertUTCtoIST2(review?.createdAt)}</span>
+                                                                {
+                                                                    loggedInUser === review?.user?._id && <span onClick={() => setDeleteReviewId(review?._id)}><MdDeleteOutline size={20} className="text-red-600 ml-2 cursor-pointer" /></span>
+                                                                }
                                                             </div>
                                                         </div>
                                                         <p className="mt-2 text-gray-700">{review.comment}</p>
@@ -653,7 +734,7 @@ export default function Page() {
                                     {/* Add Review Form */}
                                     <div id="review-form" className="mt-12 pt-6 border-t border-gray-200">
                                         <h3 className="text-lg font-bold text-gray-900 mb-4">Write a Review</h3>
-                                        <form onSubmit={handleReviewSubmit}>
+                                        <form onSubmit={createReviews}>
                                             <div className="mb-6">
                                                 <label className="block text-gray-700 font-medium mb-2">
                                                     Your Rating
@@ -705,7 +786,7 @@ export default function Page() {
                     </div>
                 </div>
 
-                <RelatedProducts category={singleProduct?.category}/>
+                <RelatedProducts category={singleProduct?.category} />
             </div>
         </div>
     );
