@@ -4,6 +4,7 @@ import adminReducers from "./adminSlice";
 import organisationReducers from "./organisationSlice";
 import kycReducers from "./kycSlice";
 import reviewReducers from "./reviewSlice";
+import cartReducers from './cartSlice'
 
 const store = configureStore({
     reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
         admin: adminReducers,
         kyc: kycReducers,
         organisation: organisationReducers,
-        review: reviewReducers
+        review: reviewReducers,
+        cart: cartReducers
     },
 });
 

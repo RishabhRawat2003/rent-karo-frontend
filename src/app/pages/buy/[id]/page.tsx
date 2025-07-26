@@ -16,6 +16,7 @@ import { decodeToken } from "@/utils/decodeToken";
 import { TOKEN } from "@/utils/enum";
 import { convertUTCtoIST2 } from "@/utils/timeConvertor";
 import CommonModal from "@/components/popup/CommonModal";
+import { addToCart } from "@/store/cartSlice";
 
 interface Organisation {
     _id: string;
@@ -166,8 +167,24 @@ export default function Page() {
         setLoading(false)
     }
 
-
     const handleAddToCart = () => {
+        toast.dismiss();
+        const data = {
+            _id: id,
+            title: singleProduct?.title,
+            subTitle: singleProduct?.subTitle,
+            category: singleProduct?.category,
+            sub_category: singleProduct?.sub_category,
+            images: singleProduct?.images,
+            stocks: singleProduct?.stocks,
+            realSellingPrice: singleProduct?.realSellingPrice,
+            sellingPrice: singleProduct?.sellingPrice,
+            discountOnSellingPrice: singleProduct?.discountOnSellingPrice,
+            wanted_to_sell: singleProduct?.wanted_to_sell,
+            quantity,
+        }
+        dispatch(addToCart(data))
+        setQuantity(1)
         toast.success('Product added to cart successfully!');
     };
 
@@ -482,7 +499,7 @@ export default function Page() {
                                             ? <><FaCheckCircle className="mr-2" /> In Stock</>
                                             : 'Out of Stock'}
                                     </span>
-                                    <span className="text-sm text-gray-600">
+                                    <span className="text-sm select-none text-gray-600">
                                         {singleProduct?.stocks} available
                                     </span>
                                 </div>
@@ -497,7 +514,7 @@ export default function Page() {
                                             }`}
                                     >
                                         <FaShoppingCart className="mr-2" />
-                                        {singleProduct?.wanted_to_sell ? 'Buy Now':'Rent Now'}
+                                        {singleProduct?.wanted_to_sell ? 'Buy Now' : 'Rent Now'}
                                     </button>
                                     <div className="flex flex-col items-center gap-2 space-x-3 sm:flex-row lg:flex-col xl:flex-row xl:gap-0">
                                         {/* Quantity Controls */}

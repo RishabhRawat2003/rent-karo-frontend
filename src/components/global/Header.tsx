@@ -5,13 +5,16 @@ import { useEffect, useState } from 'react';
 import { usePathname } from "next/navigation";
 import { TOKEN } from '@/utils/enum';
 import { decodeToken } from '@/utils/decodeToken';
+import { useSelector } from 'react-redux';
 const Header = () => {
     const pathname = usePathname();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [cartItems] = useState(3);
+    const [cartItems, setCartItems] = useState(3);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [loading, setLoading] = useState(true);
     const storedToken = typeof window !== 'undefined' ? localStorage.getItem(TOKEN) : null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { cart } = useSelector((state: any) => state.cart)
 
     const navigationLinks = [
         { name: 'Home', path: '/' },
@@ -23,6 +26,7 @@ const Header = () => {
     ];
 
     useEffect(() => {
+        setCartItems(cart.length || 0)
         if (storedToken) {
             const decodedToken = decodeToken(storedToken);
             if (decodedToken?.email) {
@@ -32,7 +36,7 @@ const Header = () => {
             setIsLoggedIn(false);
         }
         setLoading(false);
-    }, [storedToken]);
+    }, [storedToken, cart]);
 
     if (loading) {
         return (

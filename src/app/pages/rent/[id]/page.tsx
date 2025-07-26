@@ -16,6 +16,7 @@ import { decodeToken } from "@/utils/decodeToken";
 import { TOKEN } from "@/utils/enum";
 import { convertUTCtoIST2 } from "@/utils/timeConvertor";
 import CommonModal from "@/components/popup/CommonModal";
+import { addToCart } from "@/store/cartSlice";
 
 
 interface RentalPricing {
@@ -175,6 +176,21 @@ export default function Page() {
     }
 
     const handleAddToCart = () => {
+        toast.dismiss();
+        const data = {
+            _id: id,
+            title: singleProduct?.title,
+            subTitle: singleProduct?.subTitle,
+            category: singleProduct?.category,
+            sub_category: singleProduct?.sub_category,
+            images: singleProduct?.images,
+            stocks: singleProduct?.stocks,
+            rentalPricing: singleProduct?.rentalPricing,
+            wanted_to_sell: singleProduct?.wanted_to_sell,
+            quantity,
+        }
+        dispatch(addToCart(data))
+        setQuantity(1)
         toast.success('Product added to cart successfully!');
     };
 
@@ -500,7 +516,7 @@ export default function Page() {
                                             ? <><FaCheckCircle className="mr-2" /> In Stock</>
                                             : 'Out of Stock'}
                                     </span>
-                                    <span className="text-sm text-gray-600">
+                                    <span className="text-sm select-none text-gray-600">
                                         {singleProduct?.stocks} available
                                     </span>
                                 </div>
