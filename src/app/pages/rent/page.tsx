@@ -101,8 +101,8 @@ export default function ProductsPage() {
         setPagination(prev => ({ ...prev, page: 1 }));
     }, [debouncedSearchTerm, selectedCategory]);
 
-    const { sortedProducts, paginatedProducts, totalProducts } = useMemo(() => {
-        let filtered = [...products];
+    const { paginatedProducts, totalProducts } = useMemo(() => {
+        const filtered = [...products];
 
         // Apply sorting
         if (sortBy) {
