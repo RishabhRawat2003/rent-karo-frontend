@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 
-interface CartItem {
+export interface CartItem {
     _id: string;
     title: string;
     subTitle: string;

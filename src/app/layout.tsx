@@ -22,6 +22,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script async src="https://checkout.razorpay.com/v1/checkout.js"></script>
+      </head>
       <body
         className={`${roboto.variable} antialiased`}
       >
