@@ -72,7 +72,6 @@ export default function DashboardPage() {
 
     const buyerItems = [
         { id: 1, name: "Browse Rentals", icon: <LayoutGrid size={24} />, onClick: () => alert("Browse Rentals") },
-        { id: 2, name: "Buy Items", icon: <ShoppingBag size={24} />, onClick: () => alert("Buy Items") },
         { id: 3, name: "My Orders", icon: <ShoppingCart size={24} />, onClick: () => alert("My Orders") },
         { id: 4, name: "Wishlist", icon: <Heart size={24} />, onClick: () => alert("Wishlist") },
         { id: 5, name: "Invoices", icon: <FileText size={24} />, onClick: () => alert("Invoices") },

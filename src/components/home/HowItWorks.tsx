@@ -1,5 +1,6 @@
 "use client";
 import { Search, Calendar, Shield, Truck, Check, ArrowRight, Zap } from 'lucide-react';
+import Link from 'next/link';
 
 export const HowItWorks = () => {
     const steps = [
@@ -104,11 +105,11 @@ export const HowItWorks = () => {
                     ))}
                 </div>
 
-                <div className="mt-16 text-center">
-                    <button className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2 mx-auto">
+                <div className="mt-16 text-center flex">
+                    <Link href={'/pages/rent'} className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center gap-2 mx-auto">
                         Start Renting Now
                         <ArrowRight className="w-5 h-5" />
-                    </button>
+                    </Link>
                 </div>
             </div>
         </section>

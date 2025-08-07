@@ -6,6 +6,7 @@ import kycReducers from "./kycSlice";
 import reviewReducers from "./reviewSlice";
 import cartReducers from './cartSlice'
 import orderReducers from './orderSlice'
+import otpReducers from './otpSlice'
 
 const store = configureStore({
     reducer: {
@@ -15,7 +16,8 @@ const store = configureStore({
         organisation: organisationReducers,
         review: reviewReducers,
         cart: cartReducers,
-        order: orderReducers
+        order: orderReducers,
+        otp: otpReducers
     },
 });
 

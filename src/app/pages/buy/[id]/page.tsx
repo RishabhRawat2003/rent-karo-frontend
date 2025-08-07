@@ -508,6 +508,7 @@ export default function Page() {
                                 <div className="flex space-x-3 flex-col gap-2 sm:flex-row lg:flex-col xl:flex-row xl:gap-0">
                                     <button
                                         disabled={singleProduct?.stocks <= 0}
+                                        onClick={handleAddToCart}
                                         className={`flex-1 px-4 py-3 rounded-lg font-semibold transition-all flex items-center justify-center ${singleProduct?.stocks > 0
                                             ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-700 hover:to-blue-600 shadow-md hover:shadow-lg'
                                             : 'bg-gray-200 text-gray-500 cursor-not-allowed'

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from 'react';
 import { ChevronDown, HelpCircle, Check, Mail } from 'lucide-react';
+import Link from 'next/link';
 
 export const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -99,19 +100,20 @@ export const FAQ = () => {
             </div>
           ))}
 
-          <div className="mt-12 p-6 bg-blue-600 rounded-xl text-center">
+          <div className="mt-12 p-6 flex flex-col bg-blue-600 rounded-xl text-center">
             <h3 className="text-xl font-bold text-white mb-2">
               Still need help?
             </h3>
             <p className="text-blue-200 mb-4">
               Our support team is ready to assist you
             </p>
-            <button
+            <Link
+              href={"/pages/contact"}
               className="bg-white text-blue-600 px-6 py-2 rounded-lg font-medium flex items-center gap-2 mx-auto hover:bg-gray-50 transition-colors"
             >
               <Mail className="w-5 h-5" />
               Contact Support
-            </button>
+            </Link>
           </div>
         </div>
       </div>

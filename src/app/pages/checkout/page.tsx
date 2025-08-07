@@ -11,6 +11,7 @@ import { LoadingSpinnerWithOverlay } from "@/components/Loading";
 import { createPayment, verifyPayment } from "@/store/orderSlice";
 import { clearCart } from "@/store/cartSlice";
 import Image from "next/image";
+import { getKycByUser } from "@/store/kycSlice";
 
 declare global {
     interface Window {
@@ -100,8 +101,42 @@ function CheckoutPage() {
         }));
     };
 
+    async function getStatusOfKyc() {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const response = await dispatch(getKycByUser() as any)
+        if (response?.error) {
+            toast.error(response.error.message)
+        } else {
+            return response.payload.kyc
+        }
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        if (cart.length === 0) {
+            toast.error('Cart is empty')
+            return
+        }
+
+        if (!formData.name || !formData.email || !formData.phone || !formData.address || !formData.pincode || !formData.city || !formData.state) {
+            toast.error('Please fill all the fields')
+            return
+        }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const kyc: any = await getStatusOfKyc();
+        if (!kyc) {
+            toast.error('Please do the kyc verification first.')
+            router.push('/pages/account/kyc')
+            return
+        }
+
+        if (kyc.kycStatus !== 'approved') {
+            toast.error('Your kyc is not approved Yet.')
+            router.push('/pages/account/kyc')
+            return
+        }
+
         setIsSubmitting(true);
 
         const orderData = {
@@ -198,7 +233,11 @@ function CheckoutPage() {
     const shipping = 50;
     const total = subtotal + shipping;
 
-    if (loading) return <LoadingSpinnerWithOverlay />;
+    if (loading) return (
+        <div className="w-full h-screen">
+            <LoadingSpinnerWithOverlay />
+        </div>
+    )
 
     return (
         <div className="min-h-screen bg-gray-50 py-8 pt-20">

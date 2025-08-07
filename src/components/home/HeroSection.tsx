@@ -2,8 +2,17 @@
 import Link from 'next/link';
 import { ArrowRight, ShieldCheck, Tag, Handshake } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-toastify';
 
 const HeroSection = () => {
+    const router = useRouter();
+
+    function handleSignup() {
+        toast.success("you have to login first to list items.")
+        router.push('/pages/signup')
+    }
+
     return (
         <section className="bg-gradient-to-b from-blue-50 to-white pt-16">
             <div className="max-w-7xl mx-auto px-4 py-20">
@@ -22,7 +31,7 @@ const HeroSection = () => {
 
                         <div className="flex flex-col sm:flex-row items-center gap-4 justify-center md:justify-start">
                             <Link
-                                href="/listings"
+                                href="/pages/products"
                                 className="group bg-blue-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-blue-700 transition-all flex items-center gap-2 shadow-lg hover:shadow-blue-200"
                             >
                                 <span>Explore Listings</span>
@@ -32,12 +41,12 @@ const HeroSection = () => {
                             </Link>
 
                             <div>
-                                <Link
-                                    href="/list-item"
+                                <button
+                                    onClick={handleSignup}
                                     className="px-8 py-3 rounded-lg font-medium text-blue-600 hover:bg-blue-50 transition-colors border-2 border-blue-600"
                                 >
                                     List Item
-                                </Link>
+                                </button>
                             </div>
                         </div>
 
