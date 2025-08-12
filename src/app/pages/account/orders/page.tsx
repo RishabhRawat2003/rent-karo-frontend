@@ -8,20 +8,17 @@ import { useDispatch } from "react-redux"
 import { toast } from "react-toastify"
 import {
     Package,
-    Truck,
-    CheckCircle,
-    XCircle,
-    Clock,
     MapPin,
     Calendar,
     CreditCard,
     ChevronRight,
     Filter,
     Search,
-    RefreshCw,
 } from "lucide-react"
 import { LoadingSpinnerWithOverlay } from "@/components/Loading"
 import { OrderDetailsModal } from "@/components/orders/OrderDetailsModal"
+import Image from "next/image"
+import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/utils/sharedResources"
 
 export interface OrderItem {
     product_id: {
@@ -64,18 +61,7 @@ export interface Order {
     updatedAt: string;
 }
 
-export const ORDER_STATUSES = {
-    pending: { color: 'orange', icon: Clock, label: 'Pending' },
-    shipped: { color: 'blue', icon: Truck, label: 'Shipped' },
-    delivered: { color: 'green', icon: CheckCircle, label: 'Delivered' },
-    returned: { color: 'purple', icon: RefreshCw, label: 'Returned' },
-    cancelled: { color: 'red', icon: XCircle, label: 'Cancelled' }
-};
 
-export const PAYMENT_STATUSES = {
-    paid: { color: 'green', label: 'Paid' },
-    unpaid: { color: 'red', label: 'Unpaid' }
-};
 
 function OrdersPage() {
     const [orders, setOrders] = useState<Order[]>([])
@@ -113,6 +99,7 @@ function OrdersPage() {
                 })
             }
         } catch (error) {
+            console.log(error)
             toast.error("Failed to fetch orders")
         } finally {
             setLoading(false)
@@ -218,7 +205,7 @@ function OrdersPage() {
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
                         <Package size={48} className="text-gray-400 mx-auto mb-4" />
                         <h3 className="text-xl font-semibold text-gray-900 mb-2">No Orders Found</h3>
-                        <p className="text-gray-500">You haven't placed any orders yet or no orders match your search.</p>
+                        <p className="text-gray-500">You haven&apos;t placed any orders yet or no orders match your search.</p>
                     </div>
                 ) : (
                     <div className="space-y-6">
@@ -360,9 +347,11 @@ const OrderCard = ({ order, onViewDetails, formatDate, formatCurrency }: {
                         {order.order_items.slice(0, 4).map((item, index) => (
                             <div key={index} className="flex-shrink-0 group/item relative">
                                 <div className="relative overflow-hidden rounded-xl border-2 border-gray-100 group-hover/item:border-blue-200 transition-all duration-200 w-16 h-16">
-                                    <img
+                                    <Image
                                         src={item.product_id.images[0] || '/placeholder-product.jpg'}
                                         alt={item.product_id.title}
+                                        width={100}
+                                        height={100}
                                         className="w-full h-full object-cover group-hover/item:scale-110 transition-transform duration-300"
                                         onError={(e) => {
                                             (e.target as HTMLImageElement).src = '/placeholder-product.jpg';

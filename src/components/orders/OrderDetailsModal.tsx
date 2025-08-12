@@ -1,5 +1,5 @@
 "use client"
-import { Order, ORDER_STATUSES, PAYMENT_STATUSES } from "@/app/pages/account/orders/page";
+import { Order } from "@/app/pages/account/orders/page";
 import {
     Package,
     Truck,
@@ -22,6 +22,8 @@ import {
 } from "lucide-react"
 import { useState } from "react";
 import { ContactSupportModal } from "./ContactSupportModal";
+import Image from "next/image";
+import { ORDER_STATUSES, PAYMENT_STATUSES } from "@/utils/sharedResources";
 
 
 export const OrderDetailsModal = ({ order, onClose, formatDate, formatCurrency }: {
@@ -30,7 +32,6 @@ export const OrderDetailsModal = ({ order, onClose, formatDate, formatCurrency }
     formatDate: (date: string) => string;
     formatCurrency: (amount: number) => string;
 }) => {
-    console.log(order);
     const [showSupportModal, setShowSupportModal] = useState(false);
     const statusConfig = ORDER_STATUSES[order.order_status];
     const paymentConfig = PAYMENT_STATUSES[order.payment_status];
@@ -280,9 +281,11 @@ export const OrderDetailsModal = ({ order, onClose, formatDate, formatCurrency }
                                 <div key={index} className="flex flex-col sm:flex-row gap-4 p-5 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow">
                                     <div className="flex-shrink-0">
                                         <div className="relative">
-                                            <img
+                                            <Image
                                                 src={item.product_id.images[0] || '/placeholder-product.jpg'}
                                                 alt={item.product_id.title}
+                                                width={100}
+                                                height={100}
                                                 className="w-24 h-24 object-cover rounded-xl border border-gray-200"
                                                 onError={(e) => {
                                                     (e.target as HTMLImageElement).src = '/placeholder-product.jpg';

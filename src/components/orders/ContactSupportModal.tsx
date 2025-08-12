@@ -1,11 +1,13 @@
 "use client"
 import { useState } from 'react';
-import { X, MessageCircle, Package, Truck, RefreshCw, AlertCircle, ChevronDown, HelpCircle, FileText } from 'lucide-react';
+import { X, MessageCircle, Truck, RefreshCw, AlertCircle, ChevronDown, HelpCircle, FileText } from 'lucide-react';
 import { Order } from '@/app/pages/account/orders/page';
+import Image from 'next/image';
 
 export const ContactSupportModal = ({ order, onClose }: { order: Order; onClose: () => void }) => {
     const [supportType, setSupportType] = useState<string>('');
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [formData, setFormData] = useState<any>({});
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [attachments, setAttachments] = useState<File[]>([]);
@@ -31,7 +33,8 @@ export const ContactSupportModal = ({ order, onClose }: { order: Order; onClose:
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData((prev: any)=> ({ ...prev, [name]: value }));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        setFormData((prev: any) => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -69,9 +72,11 @@ export const ContactSupportModal = ({ order, onClose }: { order: Order; onClose:
                                             className="h-5 w-5 text-blue-600 rounded"
                                         />
                                         <label htmlFor={`item-${index}`} className="flex-1 flex items-center gap-3 cursor-pointer">
-                                            <img
+                                            <Image
                                                 src={item.product_id.images[0] || '/placeholder-product.jpg'}
                                                 alt={item.product_id.title}
+                                                width={48}
+                                                height={48}
                                                 className="w-12 h-12 object-cover rounded-lg border border-gray-200"
                                             />
                                             <div>
@@ -230,8 +235,10 @@ export const ContactSupportModal = ({ order, onClose }: { order: Order; onClose:
                                             className="h-5 w-5 text-blue-600 rounded"
                                         />
                                         <label htmlFor={`damaged-${index}`} className="flex-1 flex items-center gap-3 cursor-pointer">
-                                            <img
+                                            <Image
                                                 src={item.product_id.images[0] || '/placeholder-product.jpg'}
+                                                width={48}
+                                                height={48}
                                                 alt={item.product_id.title}
                                                 className="w-12 h-12 object-cover rounded-lg border border-gray-200"
                                             />
