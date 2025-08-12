@@ -38,6 +38,54 @@ const verifyPayment = createAsyncThunk("order/verify", async (data) => {
     }
 });
 
+const getOrders = createAsyncThunk("order/get-orders", async (data) => {
+    try {
+        const response = await axios.post(`${backend}/order/get-orders`, data, {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(localStorage.getItem(TOKEN))}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            throw error.response.data;
+        }
+        throw error.message || "An unexpected error occurred";
+    }
+});
+
+const getOrdersByUser = createAsyncThunk("order/get-orders-by-user", async (data) => {
+    try {
+        const response = await axios.post(`${backend}/order/get-orders-user`, data, {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(localStorage.getItem(TOKEN))}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            throw error.response.data;
+        }
+        throw error.message || "An unexpected error occurred";
+    }
+});
+
+const getSingleOrder = createAsyncThunk("order/get-single-order", async (id) => {
+    try {
+        const response = await axios.get(`${backend}/order/get-order/${id}`, {
+            headers: {
+                Authorization: `Bearer ${JSON.parse(localStorage.getItem(TOKEN))}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        if (error.response) {
+            throw error.response.data;
+        }
+        throw error.message || "An unexpected error occurred";
+    }
+});
+
 // Define the initial state
 const initialState = {
     order: null,
@@ -47,7 +95,7 @@ const initialState = {
 
 // Create the slice
 const orderSlice = createSlice({
-    name: "kyc",
+    name: "order",
     initialState,
     reducers: {},
     extraReducers: (builder) => {
@@ -74,8 +122,44 @@ const orderSlice = createSlice({
                 state.loading = false;
                 state.error = action.error.message || "An error occurred";
             })
+            .addCase(getOrders.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getOrders.fulfilled, (state, action) => {
+                state.loading = false;
+                state.order = action.payload.order;
+            })
+            .addCase(getOrders.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || "An error occurred";
+            })
+            .addCase(getOrdersByUser.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getOrdersByUser.fulfilled, (state, action) => {
+                state.loading = false;
+                state.order = action.payload.order;
+            })
+            .addCase(getOrdersByUser.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || "An error occurred";
+            })
+            .addCase(getSingleOrder.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getSingleOrder.fulfilled, (state, action) => {
+                state.loading = false;
+                state.order = action.payload.order;
+            })
+            .addCase(getSingleOrder.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message || "An error occurred";
+            })
     },
 });
 
-export { createPayment, verifyPayment };
+export { createPayment, verifyPayment, getOrders, getOrdersByUser, getSingleOrder };
 export default orderSlice.reducer;
